@@ -66,14 +66,26 @@ class _MyAppState extends State<MyApp> {
                       print(data);
                     });
                   },
-                  child: Text("Share On Instagram Story"),
+                  child: Text("Share photo On Instagram Story"),
+                ),
+                RaisedButton(
+                  onPressed: () async {
+                    File file = await ImagePicker.pickVideo(
+                        source: ImageSource.gallery);
+                    SocialShare.shareInstagramStory(file.path, "#ffffff",
+                        "#000000", "https://deep-link-url")
+                        .then((data) {
+                      print(data);
+                    });
+                  },
+                  child: Text("Share video On Instagram Story"),
                 ),
                 RaisedButton(
                   onPressed: () async {
                     await screenshotController.capture().then((image) async {
                       SocialShare.shareInstagramStorywithBackground(image.path,
                               "#ffffff", "#000000", "https://deep-link-url",
-                              backgroundImagePath: image.path)
+                          stickerImagePath: image.path)
                           .then((data) {
                         print(data);
                       });

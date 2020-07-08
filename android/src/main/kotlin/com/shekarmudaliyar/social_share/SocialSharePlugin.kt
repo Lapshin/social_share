@@ -33,24 +33,24 @@ class SocialSharePlugin(private val registrar: Registrar):  MethodCallHandler {
   override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
       if (call.method == "shareInstagramStory") {
           //share on instagram story
-              val stickerImage: String? = call.argument("stickerImage")
+          val stickerImage: String? = call.argument("stickerImage")
           val backgroundImage: String? = call.argument("backgroundImage")
 
           val backgroundTopColor: String? = call.argument("backgroundTopColor")
-              val backgroundBottomColor: String? = call.argument("backgroundBottomColor")
-              val attributionURL: String? = call.argument("attributionURL")
-            val file =  File(registrar.activeContext().cacheDir,stickerImage)
-          val stickerImageFile = FileProvider.getUriForFile(registrar.activeContext(), registrar.activeContext().applicationContext.packageName + ".com.shekarmudaliyar.social_share", file)
+          val backgroundBottomColor: String? = call.argument("backgroundBottomColor")
+          val attributionURL: String? = call.argument("attributionURL")
+          val intentType: String? = call.argument("intentType")
+          val file = File(registrar.activeContext().cacheDir,backgroundImage)
+          val backgroundImageFile = FileProvider.getUriForFile(registrar.activeContext(), registrar.activeContext().applicationContext.packageName + ".com.shekarmudaliyar.social_share", file)
 
           val intent = Intent("com.instagram.share.ADD_TO_STORY")
-              intent.type = "image/*"
           intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+          intent.setDataAndType(backgroundImageFile, intentType)
+          if(stickerImage!=null) {
+              //check if sticker image is also provided
+              val stickerFile =  File(registrar.activeContext().cacheDir, stickerImage)
+              val stickerImageFile = FileProvider.getUriForFile(registrar.activeContext(), registrar.activeContext().applicationContext.packageName + ".com.shekarmudaliyar.social_share", stickerFile)
               intent.putExtra("interactive_asset_uri", stickerImageFile)
-          if(backgroundImage!=null){
-              //check if background image is also provided
-              val backfile =  File(registrar.activeContext().cacheDir,backgroundImage)
-              val backgroundImageFile = FileProvider.getUriForFile(registrar.activeContext(), registrar.activeContext().applicationContext.packageName + ".com.shekarmudaliyar.social_share", backfile)
-              intent.setDataAndType(backgroundImageFile,"image/*")
           }
 
           intent.putExtra("content_url", attributionURL)
@@ -60,7 +60,7 @@ class SocialSharePlugin(private val registrar: Registrar):  MethodCallHandler {
               // Instantiate activity and verify it will resolve implicit intent
               val activity: Activity = registrar.activity()
               activity.grantUriPermission(
-                      "com.instagram.android", stickerImageFile, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                      "com.instagram.android", backgroundImageFile, Intent.FLAG_GRANT_READ_URI_PERMISSION)
               if (activity.packageManager.resolveActivity(intent, 0) != null) {
                   registrar.activeContext().startActivity(intent)
                   result.success("success")

@@ -7,36 +7,51 @@ import 'package:path_provider/path_provider.dart';
 class SocialShare {
   static const MethodChannel _channel = const MethodChannel('social_share');
 
+  static Future<String> copyToTemporaryDir(String mediaPath) async {
+    final tempDir = await getTemporaryDirectory();
+
+    File file = File(mediaPath);
+    String extension = file.path.split('.').last;
+    String AssetName = file.path.substring(file.parent.path.length + 1);
+    if (tempDir.toString().compareTo(file.parent.toString()) != 0) {
+      AssetName = "stickerAsset." + extension;
+      await file.copy('${tempDir.path}/${AssetName}');
+    }
+    return AssetName;
+  }
+
+  static Future<Map<String, dynamic>> getArgumentsForInstagram(String mediaPath) async {
+    String AssetName = await copyToTemporaryDir(mediaPath);
+    String extension = AssetName.split('.').last;
+    String intentType = 'image/*';
+    if (extension.compareTo("mp4") == 0 ||
+        extension.compareTo("mkv") == 0) {
+      intentType = "video/*";
+    }
+
+    return <String, dynamic>{
+      "backgroundImage": AssetName,
+      "intentType": intentType,
+    };
+  }
   static Future<String> shareInstagramStory(
-      String imagePath,
+      String mediaPath,
       String backgroundTopColor,
       String backgroundBottomColor,
       String attributionURL) async {
     Map<String, dynamic> args;
     if (Platform.isIOS) {
       args = <String, dynamic>{
-        "stickerImage": imagePath,
+        "stickerImage": mediaPath,
         "backgroundTopColor": backgroundTopColor,
         "backgroundBottomColor": backgroundBottomColor,
         "attributionURL": attributionURL
       };
     } else {
-      final tempDir = await getTemporaryDirectory();
-
-      File file = File(imagePath);
-      Uint8List bytes = file.readAsBytesSync();
-      var stickerdata = bytes.buffer.asUint8List();
-      String stickerAssetName = 'stickerAsset.png';
-      final Uint8List stickerAssetAsList = stickerdata;
-      final stickerAssetPath = '${tempDir.path}/$stickerAssetName';
-      file = await File(stickerAssetPath).create();
-      file.writeAsBytesSync(stickerAssetAsList);
-      args = <String, dynamic>{
-        "stickerImage": stickerAssetName,
-        "backgroundTopColor": backgroundTopColor,
-        "backgroundBottomColor": backgroundBottomColor,
-        "attributionURL": attributionURL
-      };
+      args = await getArgumentsForInstagram(mediaPath);
+      args["backgroundTopColor"] = backgroundTopColor;
+      args["backgroundBottomColor"] = backgroundBottomColor;
+      args["attributionURL"] = attributionURL;
     }
     final String response =
         await _channel.invokeMethod('shareInstagramStory', args);
@@ -44,46 +59,27 @@ class SocialShare {
   }
 
   static Future<String> shareInstagramStorywithBackground(
-      String imagePath,
+      String mediaPath,
       String backgroundTopColor,
       String backgroundBottomColor,
       String attributionURL,
-      {String backgroundImagePath}) async {
+      {String stickerImagePath}) async {
     Map<String, dynamic> args;
     if (Platform.isIOS) {
       args = <String, dynamic>{
-        "stickerImage": imagePath,
-        "backgroundImage": backgroundImagePath,
+        "stickerImage": mediaPath,
+        "backgroundImage": stickerImagePath,
         "backgroundTopColor": backgroundTopColor,
         "backgroundBottomColor": backgroundBottomColor,
         "attributionURL": attributionURL
       };
     } else {
-      final tempDir = await getTemporaryDirectory();
-
-      File file = File(imagePath);
-      Uint8List bytes = file.readAsBytesSync();
-      var stickerdata = bytes.buffer.asUint8List();
-      String stickerAssetName = 'stickerAsset.png';
-      final Uint8List stickerAssetAsList = stickerdata;
-      final stickerAssetPath = '${tempDir.path}/$stickerAssetName';
-      file = await File(stickerAssetPath).create();
-      file.writeAsBytesSync(stickerAssetAsList);
-
-      File backgroundimage = File(backgroundImagePath);
-      Uint8List backgroundimagedata = backgroundimage.readAsBytesSync();
-      String backgroundAssetName = 'backgroundAsset.jpg';
-      final Uint8List backgroundAssetAsList = backgroundimagedata;
-      final backgroundAssetPath = '${tempDir.path}/$backgroundAssetName';
-      File backfile = await File(backgroundAssetPath).create();
-      backfile.writeAsBytesSync(backgroundAssetAsList);
-      args = <String, dynamic>{
-        "stickerImage": stickerAssetName,
-        "backgroundImage": backgroundAssetName,
-        "backgroundTopColor": backgroundTopColor,
-        "backgroundBottomColor": backgroundBottomColor,
-        "attributionURL": attributionURL
-      };
+      args = await getArgumentsForInstagram(mediaPath);
+      String AssetName = await copyToTemporaryDir(stickerImagePath);
+      args["stickerImage"] = AssetName;
+      args["backgroundTopColor"] = backgroundTopColor;
+      args["backgroundBottomColor"] = backgroundBottomColor;
+      args["attributionURL"] = attributionURL;
     }
 
     final String response =
