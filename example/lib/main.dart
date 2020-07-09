@@ -60,130 +60,21 @@ class _MyAppState extends State<MyApp> {
                   onPressed: () async {
                     File file = await ImagePicker.pickImage(
                         source: ImageSource.gallery);
-                    SocialShare.shareInstagramStory(file.path, "#ffffff",
-                            "#000000", "https://deep-link-url")
-                        .then((data) {
+                    SocialShare.shareFile(file.path).then((data) {
                       print(data);
                     });
                   },
-                  child: Text("Share photo On Instagram Story"),
+                  child: Text("Share photo"),
                 ),
                 RaisedButton(
                   onPressed: () async {
                     File file = await ImagePicker.pickVideo(
                         source: ImageSource.gallery);
-                    SocialShare.shareInstagramStory(file.path, "#ffffff",
-                        "#000000", "https://deep-link-url")
-                        .then((data) {
+                    SocialShare.shareFile(file.path).then((data) {
                       print(data);
                     });
                   },
-                  child: Text("Share video On Instagram Story"),
-                ),
-                RaisedButton(
-                  onPressed: () async {
-                    await screenshotController.capture().then((image) async {
-                      SocialShare.shareInstagramStorywithBackground(image.path,
-                              "#ffffff", "#000000", "https://deep-link-url",
-                          stickerImagePath: image.path)
-                          .then((data) {
-                        print(data);
-                      });
-                    });
-                  },
-                  child: Text("Share On Instagram Story with background"),
-                ),
-                RaisedButton(
-                  onPressed: () async {
-                    await screenshotController.capture().then((image) async {
-                      //facebook appId is mandatory for andorid or else share won't work
-                      Platform.isAndroid
-                          ? SocialShare.shareFacebookStory(image.path,
-                                  "#ffffff", "#000000", "https://google.com",
-                                  appId: "xxxxxxxxxxxxx")
-                              .then((data) {
-                              print(data);
-                            })
-                          : SocialShare.shareFacebookStory(image.path,
-                                  "#ffffff", "#000000", "https://google.com")
-                              .then((data) {
-                              print(data);
-                            });
-                    });
-                  },
-                  child: Text("Share On Facebook Story"),
-                ),
-                RaisedButton(
-                  onPressed: () async {
-                    SocialShare.copyToClipboard(
-                      "This is Social Share plugin",
-                    ).then((data) {
-                      print(data);
-                    });
-                  },
-                  child: Text("Copy to clipboard"),
-                ),
-                RaisedButton(
-                  onPressed: () async {
-                    SocialShare.shareTwitter(
-                            "This is Social Share twitter example",
-                            hashtags: ["hello", "world", "foo", "bar"],
-                            url: "https://google.com/#/hello",
-                            trailingText: "\nhello")
-                        .then((data) {
-                      print(data);
-                    });
-                  },
-                  child: Text("Share on twitter"),
-                ),
-                RaisedButton(
-                  onPressed: () async {
-                    SocialShare.shareSms("This is Social Share Sms example",
-                            url: "\nhttps://google.com/",
-                            trailingText: "\nhello")
-                        .then((data) {
-                      print(data);
-                    });
-                  },
-                  child: Text("Share on Sms"),
-                ),
-                RaisedButton(
-                  onPressed: () async {
-                    await screenshotController.capture().then((image) async {
-                      SocialShare.shareOptions("Hello world").then((data) {
-                        print(data);
-                      });
-                    });
-                  },
-                  child: Text("Share Options"),
-                ),
-                RaisedButton(
-                  onPressed: () async {
-                    SocialShare.shareWhatsapp(
-                            "Hello World \n https://google.com")
-                        .then((data) {
-                      print(data);
-                    });
-                  },
-                  child: Text("Share on Whatsapp"),
-                ),
-                RaisedButton(
-                  onPressed: () async {
-                    SocialShare.shareTelegram(
-                            "Hello World \n https://google.com")
-                        .then((data) {
-                      print(data);
-                    });
-                  },
-                  child: Text("Share on Telegram"),
-                ),
-                RaisedButton(
-                  onPressed: () async {
-                    SocialShare.checkInstalledAppsForShare().then((data) {
-                      print(data.toString());
-                    });
-                  },
-                  child: Text("Get all Apps"),
+                  child: Text("Share video"),
                 ),
               ],
             ),
